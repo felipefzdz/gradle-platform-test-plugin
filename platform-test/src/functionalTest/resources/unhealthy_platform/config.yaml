@@ -1,0 +1,14 @@
+cluster:
+  name: cluster
+  privateKey: cluster-key
+machines:
+  - count: 1
+    spec:
+      image: quay.io/footloose/ubuntu16.04
+      name: node%d
+      portMappings:
+        - containerPort: 22
+        - containerPort: 80
+          hostPort: 8082
+      privileged: true
+
