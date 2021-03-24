@@ -27,7 +27,7 @@ dependencies {
 }
 
 gradlePlugin {
-    val kubernetesTest by plugins.creating {
+    val platformTest by plugins.creating {
         id = "com.felipefzdz.platform-test"
         implementationClass = "com.felipefzdz.platform.PlatformTestPlugin"
         displayName = "Platform Test"
