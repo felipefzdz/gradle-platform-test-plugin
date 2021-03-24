@@ -4,7 +4,7 @@ class PlatformFuncTest extends BaseFuncTest {
 
     def "run a test against a healthy platform"() {
         given:
-        def port = 8082
+        def port = 8000
         buildFile << """
 test {
     platform {
@@ -42,7 +42,7 @@ test {
         config = file("${resources.absolutePath}/healthy_platform/config.yaml")
         provision = file("${resources.absolutePath}/healthy_platform/provision.sh")
         probe {
-            port = 8082 
+            port = 8000 
             path = "/missing"
             status = 404
         }
@@ -57,7 +57,7 @@ test {
 
                 def successTest() {
                     given:
-                    def getConnection = new URL('http://localhost:8082').openConnection()
+                    def getConnection = new URL('http://localhost:8000').openConnection()
                     
                     when:
                     getConnection.requestMethod = 'GET'
@@ -91,6 +91,9 @@ test {
         probe {
             retries = 2
             delay = 10            
+            port = 8000 
+            path = "/missing"
+            status = 404
         }
     }
 } 
@@ -103,7 +106,7 @@ test {
 
                 def successTest() {
                     given:
-                    def getConnection = new URL('http://localhost:8082').openConnection()
+                    def getConnection = new URL('http://localhost:8000').openConnection()
                     
                     when:
                     getConnection.requestMethod = 'GET'
@@ -120,7 +123,7 @@ test {
 
     def "run a test starting and cleaning up the workloads manually"() {
         given:
-        def port = 8082
+        def port = 8000
         buildFile << """
 test {
     platform {

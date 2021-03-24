@@ -8,7 +8,7 @@ machines:
       name: node%d
       portMappings:
         - containerPort: 22
-        - containerPort: 80
-          hostPort: 8082
+        - containerPort: 8000
+          hostPort: 8000
       privileged: true
 

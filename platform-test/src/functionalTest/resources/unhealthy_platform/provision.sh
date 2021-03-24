@@ -4,4 +4,8 @@ set -e
 
 apt-get update
 
-apt-get install nginxxx -y
+apt-get install busybox -y
+
+echo "hello world" > index.html
+
+busybox httpd -p 9001
