@@ -1,8 +1,11 @@
 package com.felipefzdz.kubernetes.infrastructure;
 
+import com.felipefzdz.infrastructure.HttpProbe;
+import com.felipefzdz.infrastructure.Shell;
 import com.felipefzdz.kubernetes.extension.Chart;
 import com.felipefzdz.kubernetes.extension.Deployment;
 import com.felipefzdz.kubernetes.extension.KubernetesTestExtension;
+import com.felipefzdz.tasks.Invoker;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -24,7 +27,7 @@ import java.util.stream.Stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 
-public class KubernetesTestInvoker {
+public class KubernetesTestInvoker implements Invoker {
 
     private final Logger logger;
     private final KubernetesTestExtension extension;

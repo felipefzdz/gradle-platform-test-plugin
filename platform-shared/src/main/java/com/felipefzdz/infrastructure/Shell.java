@@ -1,4 +1,4 @@
-package com.felipefzdz.kubernetes.infrastructure;
+package com.felipefzdz.infrastructure;
 
 import org.gradle.api.logging.Logger;
 

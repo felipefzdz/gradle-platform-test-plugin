@@ -1,12 +1,14 @@
 package com.felipefzdz.platform.infrastructure;
 
+import com.felipefzdz.infrastructure.HttpProbe;
+import com.felipefzdz.infrastructure.Shell;
 import com.felipefzdz.platform.extension.PlatformTestExtension;
+import com.felipefzdz.tasks.Invoker;
 import com.google.common.base.Stopwatch;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.provider.Property;
 
 import java.io.File;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
-public class PlatformTestInvoker {
+public class PlatformTestInvoker implements Invoker {
 
     private final Logger logger;
     private final PlatformTestExtension extension;
@@ -27,6 +29,7 @@ public class PlatformTestInvoker {
         this.shell = new Shell(logger, extension.getProjectDir());
     }
 
+    @Override
     public void setup() {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
@@ -40,6 +43,7 @@ public class PlatformTestInvoker {
         }
     }
 
+    @Override
     public void cleanup() {
         try {
             cleanupFootloose();

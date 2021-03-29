@@ -3,8 +3,8 @@ package com.felipefzdz.kubernetes;
 import com.felipefzdz.kubernetes.extension.KubernetesExtensionConfigurer;
 import com.felipefzdz.kubernetes.extension.KubernetesTestExtension;
 import com.felipefzdz.kubernetes.infrastructure.KubernetesTestInvoker;
-import com.felipefzdz.kubernetes.tasks.CleanupTask;
-import com.felipefzdz.kubernetes.tasks.DeployToKubernetesTask;
+import com.felipefzdz.tasks.CleanupPlatformTask;
+import com.felipefzdz.tasks.DeployPlatformTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
@@ -30,8 +30,8 @@ public class KubernetesTestPlugin implements Plugin<Project> {
                 .withType(Test.class)
                 .configureEach(task -> configureTestTask(task, extension, invoker, project));
         project.getExtensions().add(KubernetesTestExtension.class, KubernetesTestExtension.NAME, extension);
-        project.getTasks().register("deployToKubernetes", DeployToKubernetesTask.class, invoker);
-        project.getTasks().register("cleanupKubernetes", CleanupTask.class, invoker);
+        project.getTasks().register("deployToKubernetes", DeployPlatformTask.class, invoker);
+        project.getTasks().register("cleanupKubernetes", CleanupPlatformTask.class, invoker);
     }
 
 }

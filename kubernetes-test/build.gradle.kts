@@ -23,6 +23,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.google.guava:guava:30.1-jre")
+    implementation(project(":platform-shared"))
     testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
     testImplementation("org.rauschig:jarchivelib:1.1.0")
 }

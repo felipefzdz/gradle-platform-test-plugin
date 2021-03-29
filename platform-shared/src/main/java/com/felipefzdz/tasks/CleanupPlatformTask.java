@@ -1,6 +1,5 @@
-package com.felipefzdz.platform.tasks;
+package com.felipefzdz.tasks;
 
-import com.felipefzdz.platform.infrastructure.PlatformTestInvoker;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -8,10 +7,10 @@ import javax.inject.Inject;
 
 public class CleanupPlatformTask extends DefaultTask {
 
-    private final PlatformTestInvoker invoker;
+    private final Invoker invoker;
 
     @Inject
-    public CleanupPlatformTask(PlatformTestInvoker invoker) {
+    public CleanupPlatformTask(Invoker invoker) {
         this.invoker = invoker;
     }
 

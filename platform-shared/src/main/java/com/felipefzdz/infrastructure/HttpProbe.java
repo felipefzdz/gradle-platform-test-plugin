@@ -1,6 +1,6 @@
-package com.felipefzdz.kubernetes.infrastructure;
+package com.felipefzdz.infrastructure;
 
-import com.felipefzdz.kubernetes.extension.Probe;
+import com.felipefzdz.extension.Probe;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -10,9 +10,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.felipefzdz.kubernetes.infrastructure.HttpProbe.HttpProbeStatus.failure;
-import static com.felipefzdz.kubernetes.infrastructure.HttpProbe.HttpProbeStatus.success;
-import static com.felipefzdz.kubernetes.infrastructure.RetryStrategy.delayRetry;
+import static com.felipefzdz.infrastructure.RetryStrategy.delayRetry;
 
 public class HttpProbe {
 
@@ -37,9 +35,9 @@ public class HttpProbe {
                 .build();
         try {
             httpClient.execute(new HttpGet("http://localhost:" + probe.getPort().get() + "" + probe.getPath().get()));
-            return success();
+            return HttpProbeStatus.success();
         } catch (IOException e) {
-            return failure(e);
+            return HttpProbeStatus.failure(e);
         }
     }
 

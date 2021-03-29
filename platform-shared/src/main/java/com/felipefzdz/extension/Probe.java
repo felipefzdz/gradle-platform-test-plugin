@@ -1,4 +1,4 @@
-package com.felipefzdz.kubernetes.extension;
+package com.felipefzdz.extension;
 
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
