@@ -1,69 +1,10 @@
 [[platform_test_plugin]]
 = The Platform Test Plugin
 
-The Platform Test Gradle plugin manages the lifecycle of a platform to set up systems under test for E2E testing
+The Platform Test Gradle plugin manages the lifecycle of a platform to set up systems under test for E2E testing.
 
-[[sec:platform_test_usage]]
-== Usage
+Details on how to use it can be found at the README of the `platform-test` module.
 
-To use the Platform Test plugin, include the following in your build script:
+This repo also hosts an opinionated flavor of the platform test concept for Kubernetes based installations.
 
-[source,kotlin]
-----
-plugins {
-    id("com.felipefzdz.platform-test") version "0.0.1"
-}
-----
-
-[[sec:platform_test_tasks]]
-== Tasks
-
-The plugin augments Gradle’s built-in test task by setting up a Footloose lightweight VM (actually just a docker container), deploying a workload on it and waiting for some probe.
-Finally, disregarding of the test outcome, the container enclosing the platform will be destroyed.
-
-To do that, it uses link:url[Footloose, https://github.com/weaveworks/footloose], a tool that mimics a VM in Docker.
-
-This implies that no dependencies are required on the executing machine, except for Docker itself.
-
-It also adds a couple of tasks called `deployPlatform` and `cleanupPlatform` to the project, to execute those functionalities independently from the test task.
-
-[[sec:platform_test_extension]]
-=== Extension
-
-[source,kotlin]
-----
-test {
-    platform {
-        config = file("/installationDir/config.yaml")
-        provision = file("/installationDir/provision.sh")
-        probe {
-            retries = 2
-            delay = 20
-            port = 8082
-            path = "/missing"
-            status = 404
-        }
-    }
-}
-----
-
-Note: define the `platform` extension block outside of `test` if your intent is using the `deployPlatform` and `cleanupPlatform`
-tasks on their own.
-
-* config - yaml file to define the Footloose container. Name is irrelevant as it will be mapped to the required `footloose.yaml` See link:url[here, https://github.com/weaveworks/footloose#footlooseyaml]
-* provision - bash script to deploy the platform into the container.
-* probe - for above's example, the plugin won't give control to the test task until http://localhost:8082/missing would return 404.
-It will retry twice, with a 120 seconds delay.
-** retries - by default 20
-** delay - in seconds. By default 10 seconds.
-** port - an ingress controller will be open on this configured port, i.e. localhost:port will be accessible from the host. By default 8081.
-** path - where to check that the platform is ready to serve, aka ready to be tested. By default "/". N.b the leading slash is expected
-** status - the acceptable status code return by the probe. By default 200
-
-[[sec:platform_test_notes]]
-== Notes
-
-=== Docker Desktop for Mac
-
-When using Docker Desktop for Mac bear in mind that the default memory limit for containers is
-2GB so it might be insufficient for your deployments.
+Details on how to use it can be found at the README of the `kubernetes-test` module.
