@@ -3,8 +3,8 @@
 
 The Platform Test Gradle plugin manages the lifecycle of a platform to set up systems under test for E2E testing.
 
-Details on how to use it can be found at the README of the `platform-test` module.
+Details on how to use it can be found at the README of the link:url[platform-test, https://github.com/felipefzdz/gradle-platform-test-plugin/tree/main/platform-test] module.
 
 This repo also hosts an opinionated flavor of the platform test concept for Kubernetes based installations.
 
-Details on how to use it can be found at the README of the `kubernetes-test` module.
+Details on how to use it can be found at the README of the link:url[kubernetes-test, https://github.com/felipefzdz/gradle-platform-test-plugin/tree/main/kubernetes-test] module.
