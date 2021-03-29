@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.felipefzdz"
-version = "0.0.4"
+version = "0.0.5"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
