@@ -11,44 +11,38 @@ To use the Platform Test plugin, include the following in your build script:
 [source,kotlin]
 ----
 plugins {
-    id("com.felipefzdz.platform-test") version "0.0.1"
+    id("com.felipefzdz.platform-test") version "0.0.3"
 }
 ----
 
 [[sec:platform_test_tasks]]
 == Tasks
 
-The plugin augments Gradle’s built-in test task by setting up a Footloose lightweight VM (actually just a docker container), deploying a workload on it and waiting for some probe.
-Finally, disregarding of the test outcome, the container enclosing the platform will be destroyed.
+The plugin intends to augment Gradle’s built-in test task by providing a task called `deployPlatform` that will set up
+a Footloose lightweight VM (actually just a docker container), deploy a workload on it and wait for some probe.
+To cleanup the container enclosing the platform a task called `cleanupPlatform` will have to be called.
 
 To do that, it uses link:url[Footloose, https://github.com/weaveworks/footloose], a tool that mimics a VM in Docker.
 
 This implies that no dependencies are required on the executing machine, except for Docker itself.
-
-It also adds a couple of tasks called `deployPlatform` and `cleanupPlatform` to the project, to execute those functionalities independently from the test task.
 
 [[sec:platform_test_extension]]
 === Extension
 
 [source,kotlin]
 ----
-test {
-    platform {
-        config = file("/installationDir/config.yaml")
-        provision = file("/installationDir/provision.sh")
-        probe {
-            retries = 2
-            delay = 20
-            port = 8082
-            path = "/missing"
-            status = 404
-        }
+platform {
+    config = file("/installationDir/config.yaml")
+    provision = file("/installationDir/provision.sh")
+    probe {
+        retries = 2
+        delay = 20
+        port = 8082
+        path = "/missing"
+        status = 404
     }
 }
 ----
-
-Note: define the `platform` extension block outside of `test` if your intent is using the `deployPlatform` and `cleanupPlatform`
-tasks on their own.
 
 * config - yaml file to define the Footloose container. Name is irrelevant as it will be mapped to the required `footloose.yaml` See link:url[here, https://github.com/weaveworks/footloose#footlooseyaml]
 * provision - bash script to deploy the platform into the container.
