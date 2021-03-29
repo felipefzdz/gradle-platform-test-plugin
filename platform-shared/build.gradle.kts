@@ -1,5 +1,5 @@
 plugins {
-    `java-gradle-plugin`
+    java
 }
 
 java {
@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    implementation(gradleApi())
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.google.guava:guava:30.1-jre")
