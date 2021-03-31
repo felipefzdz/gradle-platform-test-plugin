@@ -7,4 +7,4 @@ Details on how to use it can be found at the README of the link:https://github.c
 
 This repo also hosts an opinionated flavor of the platform test concept for Kubernetes based installations.
 
-Details on how to use it can be found at the README of the link:https://github.com/felipefzdz/gradle-platform-test-plugin/tree/main/kubernetes-test/[kubernetes-test] module.
+Details on how to use it can be found at the README of the link:https://github.com/felipefzdz/gradle-platform-test-plugin/tree/main/platform-test/src/main/java/com/felipefzdz/kubernetes/[kubernetes] folder.

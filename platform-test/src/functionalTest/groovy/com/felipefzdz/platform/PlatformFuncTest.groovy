@@ -1,6 +1,6 @@
 package com.felipefzdz.platform
 
-class PlatformFuncTest extends BaseFuncTest {
+class PlatformFuncTest extends BasePlatformFuncTest {
 
     def "run a test against a healthy platform"() {
         given:

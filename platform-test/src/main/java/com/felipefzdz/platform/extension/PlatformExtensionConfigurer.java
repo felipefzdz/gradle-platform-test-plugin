@@ -1,6 +1,6 @@
 package com.felipefzdz.platform.extension;
 
-import com.felipefzdz.platform.base.extension.Probe;
+import com.felipefzdz.base.extension.Probe;
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
 

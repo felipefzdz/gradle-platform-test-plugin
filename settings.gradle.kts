@@ -3,7 +3,6 @@ plugins {
 }
 
 rootProject.name = "gradle-platform-test-plugin"
-include("kubernetes-test")
 include("platform-test")
 include("platform-test-base")
 
