@@ -25,7 +25,7 @@ kubernetes {
         successTestOnPort(port)
 
         when:
-        gradleRunner("deployToKubernetes").build()
+        gradleRunner("deployKubernetes").build()
 
         then:
         gradleRunner('test', '-s').build()

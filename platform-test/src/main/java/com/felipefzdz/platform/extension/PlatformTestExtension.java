@@ -13,9 +13,8 @@ public class PlatformTestExtension {
 
     public static String NAME = "platform";
 
-    private final Project project;
-
     private String footlooseVersion = "0.6.3";
+    private final Project project;
 
     private final Probe probe;
 

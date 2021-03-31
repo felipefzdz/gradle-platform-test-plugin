@@ -6,7 +6,7 @@ The Kubernetes flavor of the Platform Test Gradle plugin manages the lifecycle o
 [[sec:kubernetes_test_tasks]]
 == Tasks
 
-The plugin intends to augment Gradle’s built-in test task by providing a task called `deployToKubernetes` that will set up
+The plugin intends to augment Gradle’s built-in test task by providing a task called `deployKubernetes` that will set up
  a Kubernetes cluster, deploying a workload on it and waiting for some probe.
 
 To cleanup the container enclosing the Kubernetes cluster a task called `cleanupKubernetes` will have to be called.

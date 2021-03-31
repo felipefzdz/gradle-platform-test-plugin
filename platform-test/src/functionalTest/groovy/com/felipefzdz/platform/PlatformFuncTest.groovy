@@ -2,7 +2,7 @@ package com.felipefzdz.platform
 
 class PlatformFuncTest extends BasePlatformFuncTest {
 
-    def "run a test against a healthy platform"() {
+    def "runs a test against a healthy platform"() {
         given:
         def port = 8000
         buildFile << """

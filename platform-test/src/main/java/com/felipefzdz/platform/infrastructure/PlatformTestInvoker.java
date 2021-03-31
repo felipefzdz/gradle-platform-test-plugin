@@ -2,8 +2,8 @@ package com.felipefzdz.platform.infrastructure;
 
 import com.felipefzdz.base.infrastructure.HttpProbe;
 import com.felipefzdz.base.infrastructure.Shell;
-import com.felipefzdz.platform.extension.PlatformTestExtension;
-import com.felipefzdz.base.tasks.Invoker;
+import com.felipefzdz.platform.tasks.CleanupPlatformTask;
+import com.felipefzdz.platform.tasks.DeployPlatformTask;
 import com.google.common.base.Stopwatch;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.RegularFileProperty;
@@ -17,84 +17,71 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
-public class PlatformTestInvoker implements Invoker {
+public class PlatformTestInvoker {
 
-    private final Logger logger;
-    private final PlatformTestExtension extension;
-    private final Shell shell;
+    private static final Logger logger = Logging.getLogger(PlatformTestInvoker.class);
 
-    public PlatformTestInvoker(PlatformTestExtension extension) {
-        this.logger = Logging.getLogger(PlatformTestInvoker.class);
-        this.extension = extension;
-        this.shell = new Shell(logger, extension.getProjectDir());
-    }
-
-    @Override
-    public void setup() {
+    public static void setup(DeployPlatformTask task) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            setupFootloose();
+            Shell shell = new Shell(logger, task.getProjectDir());
+            setupFootloose(task, shell);
             logger.info("Footloose setup elapsed time: " + stopwatch);
-            deployPlatform();
-            executeProbe();
+            deployPlatform(task, shell);
+            executeProbe(task);
             logger.info("Platform available elapsed time: " + stopwatch);
         } catch (RuntimeException e) {
             throw new GradleException("Error while doing the platform setup", e);
         }
     }
 
-    @Override
-    public void cleanup() {
+    public static void cleanup(CleanupPlatformTask task) {
         try {
-            cleanupFootloose();
+            Shell shell = new Shell(logger, task.getProjectDir());
+            cleanupFootloose(task, shell);
         } catch (RuntimeException e) {
             throw new GradleException("Error while doing the platform cleanup", e);
         }
     }
 
-    private void setupFootloose() {
-        final List<String> command = join(getFootlooseCommand(extension.getFootlooseVersion(), extension.getConfig()), "create");
+    private static void cleanupFootloose(CleanupPlatformTask task, Shell shell) {
+        shell.run(join(getFootlooseCommand(task.getFootlooseVersion(), task.getConfig()), "delete"));
+    }
+
+    private static void setupFootloose(DeployPlatformTask task, Shell shell) {
+        final List<String> command = join(getFootlooseCommand(task.getFootlooseVersion(), task.getConfig()), "create");
         shell.run(command);
     }
 
-    private void cleanupFootloose() {
-        shell.run(join(getFootlooseCommand(extension.getFootlooseVersion(), extension.getConfig()), "delete"));
+    private static void deployPlatform(DeployPlatformTask task, Shell shell) {
+        final File provisionScript = task.getProvision().get().getAsFile();
+        copyFolder(provisionScript.getParentFile(), shell);
+        executeScript(provisionScript.getName(), shell);
     }
 
-    private void deployPlatform() {
-        final File provisionScript = extension.getProvision().get().getAsFile();
-        copyFolder(provisionScript.getParentFile());
-        executeScript(provisionScript.getName());
-    }
-
-    private void copyFolder(File file) {
+    private static void copyFolder(File file, Shell shell) {
         shell.run(asList("docker", "cp", file.getAbsolutePath() + "/.", "cluster-node0:/"));
     }
 
-    private void executeScript(String script) {
+    private static void executeScript(String script, Shell shell) {
         shell.run(asList("docker", "exec", "cluster-node0", "sh", script));
     }
 
-    private void executeProbe() {
-        final HttpProbe.HttpProbeStatus result = HttpProbe.run(extension.getProbe());
+    private static void executeProbe(DeployPlatformTask task) {
+        final HttpProbe.HttpProbeStatus result = HttpProbe.run(task.getProbe());
         if (result.failure) {
-            generateSupportBundle();
             throw new GradleException("Error while probing the platform", result.maybeException.get());
         }
     }
 
-    private void generateSupportBundle() {
-    }
-
-    private List<String> getFootlooseCommand(String footlooseVersion, RegularFileProperty config) {
+    private static List<String> getFootlooseCommand(String footlooseVersion, RegularFileProperty config) {
         return asList("docker", "run", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock",
                 "-v", config.get().getAsFile().getAbsolutePath() + ":/footloose/footloose.yaml",
                 "felipefzdz/docker-footloose:" + footlooseVersion);
     }
 
-    private List<String> join(List<String> firstPartCommand, String... secondPartCommand) {
+    private static List<String> join(List<String> firstPartCommand, String... secondPartCommand) {
         return Stream.concat(firstPartCommand.stream(), Stream.of(secondPartCommand))
                 .collect(Collectors.toList());
     }
-
 }

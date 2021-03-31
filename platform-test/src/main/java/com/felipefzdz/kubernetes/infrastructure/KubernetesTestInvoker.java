@@ -1,11 +1,11 @@
 package com.felipefzdz.kubernetes.infrastructure;
 
-import com.felipefzdz.kubernetes.extension.Chart;
-import com.felipefzdz.kubernetes.extension.Deployment;
-import com.felipefzdz.kubernetes.extension.KubernetesTestExtension;
 import com.felipefzdz.base.infrastructure.HttpProbe;
 import com.felipefzdz.base.infrastructure.Shell;
-import com.felipefzdz.base.tasks.Invoker;
+import com.felipefzdz.kubernetes.extension.Chart;
+import com.felipefzdz.kubernetes.extension.Deployment;
+import com.felipefzdz.kubernetes.tasks.CleanupKubernetesTask;
+import com.felipefzdz.kubernetes.tasks.DeployKubernetesTask;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
@@ -26,152 +26,147 @@ import java.util.stream.Stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 
-public class KubernetesTestInvoker implements Invoker {
+public class KubernetesTestInvoker {
 
-    private final Logger logger;
-    private final KubernetesTestExtension extension;
-    private final Shell shell;
+    private static final Logger logger = Logging.getLogger(KubernetesTestInvoker.class);
 
-    public KubernetesTestInvoker(KubernetesTestExtension extension) {
-        this.logger = Logging.getLogger(KubernetesTestInvoker.class);
-        this.extension = extension;
-        this.shell = new Shell(logger, extension.getProjectDir());
-    }
-
-    public void setup() {
+    public static void setup(DeployKubernetesTask task) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            setupK3d();
+            Shell shell = new Shell(logger, task.getProjectDir());
+            setupK3d(task, shell);
             logger.info("K3d setup elapsed time: " + stopwatch);
-            maybeCreateNamespace();
-            deployDeployment();
-            exposeService();
-            executeProbe();
+            maybeCreateNamespace(task, shell);
+            deployDeployment(task, shell);
+            exposeService(task, shell);
+            executeProbe(task, shell);
             logger.info("Deployment available elapsed time: " + stopwatch);
         } catch (RuntimeException e) {
             throw new GradleException("Error while doing the Kubernetes setup", e);
         }
+
     }
 
-    public void cleanup() {
+    public static void cleanup(CleanupKubernetesTask task) {
         try {
-            cleanupK3d();
+            Shell shell = new Shell(logger, task.getProjectDir());
+            cleanupK3d(task, shell);
         } catch (RuntimeException e) {
             throw new GradleException("Error while doing the Kubernetes cleanup", e);
         }
     }
 
 
-    private void setupK3d() {
-        final List<String> command = join(getK3dClusterCommand(extension.getK3dVersion()), "create", "-p", extension.getProbe().getPort().get() + ":80@loadbalancer", "test-k3d");
+    private static void setupK3d(DeployKubernetesTask task, Shell shell) {
+        final List<String> command = join(getK3dClusterCommand(task.getK3dVersion()), "create", "-p", task.getProbe().getPort().get() + ":80@loadbalancer", "test-k3d");
         shell.run(command);
     }
 
-    private void cleanupK3d() {
-        shell.run(join(getK3dClusterCommand(extension.getK3dVersion()), "delete", "test-k3d"));
+    private static void cleanupK3d(CleanupKubernetesTask task, Shell shell) {
+        shell.run(join(getK3dClusterCommand(task.getK3dVersion()), "delete", "test-k3d"));
     }
 
-    private void maybeCreateNamespace() {
-        final String namespace = extension.getNamespace().get();
+    private static void maybeCreateNamespace(DeployKubernetesTask task, Shell shell) {
+        final String namespace = task.getNamespace().get();
         if (!"default".equals(namespace)) {
             shell.run(join(getKubectlCommand(), "create", "namespace", namespace));
         }
     }
 
-    private void copyManifests() {
-        extension.getDeployment().getManifests().getFiles().forEach(this::copyFile);
+    private static void copyManifests(DeployKubernetesTask task, Shell shell) {
+        task.getDeployment().getManifests().getFiles().forEach(file -> copyFile(file, shell));
     }
 
-    private void copyFile(File file) {
+    private static void copyFile(File file, Shell shell) {
         shell.run(asList("docker", "cp", file.getAbsolutePath(), "k3d-test-k3d-server-0:/" + file.getName()));
     }
 
-    private void copyFolder(File file) {
+    private static void copyFolder(File file, Shell shell) {
         shell.run(asList("docker", "cp", file.getAbsolutePath() + "/.", "k3d-test-k3d-server-0:/"));
     }
 
-    private void downloadSupportBundle() {
+    private static void downloadSupportBundle(Shell shell) {
         shell.run(asList("docker", "cp", "k3d-test-k3d-server-0:/support-bundle.tar", "support-bundle.tar"));
     }
 
-    private void deployManifests() {
-        extension.getDeployment().getManifests().getFiles().forEach(this::deployManifest);
+    private static void deployManifests(DeployKubernetesTask task, Shell shell) {
+        task.getDeployment().getManifests().getFiles().forEach(manifest -> deployManifest(task, manifest, shell));
     }
 
-    private void exposeService() {
+    private static void exposeService(DeployKubernetesTask task, Shell shell) {
         try {
             String ingressContent = IOUtils.toString(KubernetesTestInvoker.class.getClassLoader().getResourceAsStream("ingress.yaml"), UTF_8);
             File ingressManifest = File.createTempFile("temp", "ingress.yaml");
             String ingressManifestInterpolated = ingressContent
-                    .replace("name:", "name: " + extension.getDeployment().getEdge().getName().get())
-                    .replace("number:", "number: " + extension.getDeployment().getEdge().getPort().get());
+                    .replace("name:", "name: " + task.getDeployment().getEdge().getName().get())
+                    .replace("number:", "number: " + task.getDeployment().getEdge().getPort().get());
             FileUtils.writeStringToFile(ingressManifest, ingressManifestInterpolated, UTF_8);
-            copyFile(ingressManifest);
-            deployManifest(ingressManifest);
+            copyFile(ingressManifest, shell);
+            deployManifest(task, ingressManifest, shell);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void deployManifest(File manifest) {
-        shell.run(join(getKubectlWithNamespaceCommand(extension.getNamespace().get()), "apply", "-f", manifest.getName()));
+    private static void deployManifest(DeployKubernetesTask task, File manifest, Shell shell) {
+        shell.run(join(getKubectlWithNamespaceCommand(task.getNamespace().get()), "apply", "-f", manifest.getName()));
     }
 
-    private void executeScript(String script) {
+    private static void executeScript(String script, Shell shell) {
         shell.run(asList("docker", "exec", "k3d-test-k3d-server-0", "sh", script));
     }
 
-    private void executeScriptWithEnvVar(String script, String envVar) {
+    private static void executeScriptWithEnvVar(String script, String envVar, Shell shell) {
         shell.run(asList("docker", "exec", "-e", "NAMESPACE=" + envVar, "k3d-test-k3d-server-0", "sh", script));
     }
 
-    private void executeProbe() {
-        final HttpProbe.HttpProbeStatus result = HttpProbe.run(extension.getProbe());
+    private static void executeProbe(DeployKubernetesTask task, Shell shell) {
+        final HttpProbe.HttpProbeStatus result = HttpProbe.run(task.getProbe());
         if (result.failure) {
-            generateSupportBundle();
+            generateSupportBundle(task, shell);
             throw new GradleException("Error while probing the application", result.maybeException.get());
         }
     }
 
-    private void generateSupportBundle() {
+    private static void generateSupportBundle(DeployKubernetesTask task , Shell shell) {
         try {
             String supportBundleContent = IOUtils.toString(KubernetesTestInvoker.class.getClassLoader().getResourceAsStream("support_bundle.sh"), UTF_8);
             File supportBundleScript = File.createTempFile("temp", "support_bundle.sh");
-            String supportBundleContentInterpolated = supportBundleContent.replace("K8S_NAMESPACE=", "K8S_NAMESPACE=" + extension.getNamespace().get());
+            String supportBundleContentInterpolated = supportBundleContent.replace("K8S_NAMESPACE=", "K8S_NAMESPACE=" + task.getNamespace());
             FileUtils.writeStringToFile(supportBundleScript, supportBundleContentInterpolated, UTF_8, true);
-            copyFile(supportBundleScript);
-            executeScript(supportBundleScript.getName());
-            downloadSupportBundle();
+            copyFile(supportBundleScript, shell);
+            executeScript(supportBundleScript.getName(), shell);
+            downloadSupportBundle(shell);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<String> getK3dClusterCommand(String k3dVersion) {
+    private static List<String> getK3dClusterCommand(String k3dVersion) {
         return asList("docker", "run", "--rm", "-v", "/var/run/docker.sock:/var/run/docker.sock", "rancher/k3d:" + k3dVersion, "cluster");
     }
 
-    private List<String> getKubectlCommand() {
+    private static List<String> getKubectlCommand() {
         return asList("docker", "exec", "k3d-test-k3d-server-0", "kubectl");
     }
 
-    private List<String> getKubectlWithNamespaceCommand(String namespace) {
+    private static List<String> getKubectlWithNamespaceCommand(String namespace) {
         return join(getKubectlCommand(), "--namespace", namespace);
     }
 
-    private List<String> join(List<String> firstPartCommand, String... secondPartCommand) {
+    private static List<String> join(List<String> firstPartCommand, String... secondPartCommand) {
         return Stream.concat(firstPartCommand.stream(), Stream.of(secondPartCommand))
                 .collect(Collectors.toList());
     }
 
-    private void deployDeployment() {
-        Deployer.of(extension.getDeployment(), this).deploy(extension);
+    private static void deployDeployment(DeployKubernetesTask task, Shell shell) {
+        Deployer.of(task.getDeployment()).deploy(task, shell);
     }
 
-    private void installHelmChart(Chart chart) {
+    private static void installHelmChart(Chart chart, Shell shell) {
         try {
-            File installChartScript = createInstallChartScript(chart);
-            shell.run(asList("docker", "run", "-v", createKubeconfig().getAbsolutePath() + ":/root/.kube/config",
+            File installChartScript = createInstallChartScript(chart, shell);
+            shell.run(asList("docker", "run", "-v", createKubeconfig(shell).getAbsolutePath() + ":/root/.kube/config",
                     "-v", installChartScript.getAbsolutePath() + ":/config/" + installChartScript.getName(), "--rm",
                     "dtzar/helm-kubectl", "/bin/sh", "-c", "\"/config/" + installChartScript.getName() + "\""));
         } catch (IOException e) {
@@ -179,7 +174,7 @@ public class KubernetesTestInvoker implements Invoker {
         }
     }
 
-    private File createInstallChartScript(Chart chart) throws IOException {
+    private static File createInstallChartScript(Chart chart, Shell shell) throws IOException {
         String installChartContent = IOUtils.toString(KubernetesTestInvoker.class.getClassLoader().getResourceAsStream("install_chart.sh"), UTF_8);
         File installChartScript = File.createTempFile("temp", "install_chart.sh");
         String installChartContentInterpolated = interpolateContent(ImmutableMap.of(
@@ -194,14 +189,14 @@ public class KubernetesTestInvoker implements Invoker {
         return installChartScript;
     }
 
-    private Optional<String> addToRepoCommand(Chart chart) {
+    private static Optional<String> addToRepoCommand(Chart chart) {
         if (chart.getUser().getOrNull() == null || chart.getPassword().getOrNull() == null) {
             return Optional.empty();
         }
         return Optional.of("http://host.docker.internal:8080 --username " + chart.getUser().get() + " --password " + chart.getPassword().get());
     }
 
-    private String interpolateContent(Map<String, Optional<String>> interpolators, String content) {
+    private static String interpolateContent(Map<String, Optional<String>> interpolators, String content) {
         for (Map.Entry<String, Optional<String>> interpolator : interpolators.entrySet()) {
             if (interpolator.getValue().isPresent()) {
                 content = content.replace(interpolator.getKey(), interpolator.getValue().get());
@@ -210,7 +205,7 @@ public class KubernetesTestInvoker implements Invoker {
         return content;
     }
 
-    private File createKubeconfig() throws IOException {
+    private static File createKubeconfig(Shell shell) throws IOException {
         String kubeConfigContent = shell.run(asList("docker", "exec", "k3d-test-k3d-server-0", "kubectl", "config", "view", "--raw"));
         String k3sPort = shell.run(asList("docker", "port", "k3d-test-k3d-serverlb", "6443")).replace("0.0.0.0", "host.docker.internal");
         String kubeConfigContentInterpolated = kubeConfigContent.replace("127.0.0.1:6443", k3sPort);
@@ -220,64 +215,45 @@ public class KubernetesTestInvoker implements Invoker {
     }
 
     public interface Deployer {
-        void deploy(KubernetesTestExtension extension);
+        void deploy(DeployKubernetesTask task, Shell shell);
 
-        static Deployer of(Deployment deployment, KubernetesTestInvoker invoker) {
+        static Deployer of(Deployment deployment) {
             if (deployment.getManifests() != null) {
-                return new ManifestDeployer(invoker);
+                return new ManifestDeployer();
             }
             if (deployment.getScript().getOrNull() != null) {
-                return new ScriptDeployer(invoker);
+                return new ScriptDeployer();
             }
-            return new ChartDeployer(invoker);
+            return new ChartDeployer();
         }
     }
 
     public static class ManifestDeployer implements Deployer {
 
-        private final KubernetesTestInvoker invoker;
-
-        public ManifestDeployer(KubernetesTestInvoker invoker) {
-            this.invoker = invoker;
-        }
-
         @Override
-        public void deploy(KubernetesTestExtension extension) {
-            invoker.copyManifests();
-            invoker.deployManifests();
+        public void deploy(DeployKubernetesTask task, Shell shell) {
+            copyManifests(task, shell);
+            deployManifests(task, shell);
         }
     }
 
     public static class ScriptDeployer implements Deployer {
-
-        private final KubernetesTestInvoker invoker;
-
-        public ScriptDeployer(KubernetesTestInvoker invoker) {
-            this.invoker = invoker;
-        }
-
         @Override
-        public void deploy(KubernetesTestExtension extension) {
-            final RegularFile maybeScript = extension.getDeployment().getScript().getOrNull();
+        public void deploy(DeployKubernetesTask task, Shell shell) {
+            final RegularFile maybeScript = task.getDeployment().getScript().getOrNull();
             if (maybeScript == null) {
                 throw new GradleException("Please provide manifests or script into the deployment extension");
             }
             final File script = maybeScript.getAsFile();
-            invoker.copyFolder(script.getParentFile());
-            invoker.executeScriptWithEnvVar(script.getName(), extension.getNamespace().get());
+            copyFolder(script.getParentFile(), shell);
+            executeScriptWithEnvVar(script.getName(), task.getNamespace().get(), shell);
         }
     }
 
     public static class ChartDeployer implements Deployer {
-        private final KubernetesTestInvoker invoker;
-
-        public ChartDeployer(KubernetesTestInvoker invoker) {
-            this.invoker = invoker;
-        }
-
         @Override
-        public void deploy(KubernetesTestExtension extension) {
-            invoker.installHelmChart(extension.getDeployment().getChart());
+        public void deploy(DeployKubernetesTask task, Shell shell) {
+            installHelmChart(task.getDeployment().getChart(), shell);
         }
 
     }

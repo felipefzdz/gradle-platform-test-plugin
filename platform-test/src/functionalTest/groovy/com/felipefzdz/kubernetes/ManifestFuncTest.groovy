@@ -29,7 +29,7 @@ kubernetes {
         successTestOnPort(port)
 
         when:
-        gradleRunner("deployToKubernetes").build()
+        gradleRunner("deployKubernetes").build()
 
         then:
         gradleRunner('test', '-s').build()
@@ -86,7 +86,7 @@ test {
         """
 
         expect:
-        gradleRunner("deployToKubernetes").buildAndFail()
+        gradleRunner("deployKubernetes").buildAndFail()
         gradleRunner("cleanupKubernetes").build()
 
         when:
