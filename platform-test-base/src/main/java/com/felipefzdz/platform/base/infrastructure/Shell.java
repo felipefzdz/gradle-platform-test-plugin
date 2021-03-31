@@ -1,4 +1,4 @@
-package com.felipefzdz.infrastructure;
+package com.felipefzdz.platform.base.infrastructure;
 
 import org.gradle.api.logging.Logger;
 

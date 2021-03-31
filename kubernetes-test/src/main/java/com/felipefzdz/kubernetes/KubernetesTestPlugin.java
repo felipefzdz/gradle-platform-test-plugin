@@ -3,8 +3,9 @@ package com.felipefzdz.kubernetes;
 import com.felipefzdz.kubernetes.extension.KubernetesExtensionConfigurer;
 import com.felipefzdz.kubernetes.extension.KubernetesTestExtension;
 import com.felipefzdz.kubernetes.infrastructure.KubernetesTestInvoker;
-import com.felipefzdz.tasks.CleanupPlatformTask;
-import com.felipefzdz.tasks.DeployPlatformTask;
+import com.felipefzdz.platform.base.PlatformTestBasePlugin;
+import com.felipefzdz.platform.base.tasks.CleanupPlatformTask;
+import com.felipefzdz.platform.base.tasks.DeployPlatformTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
@@ -24,6 +25,7 @@ public class KubernetesTestPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        project.getPluginManager().apply(PlatformTestBasePlugin.class);
         KubernetesTestExtension extension = KubernetesExtensionConfigurer.setupExtension(objectFactory, project);
         final KubernetesTestInvoker invoker = new KubernetesTestInvoker(extension);
         project.getTasks()

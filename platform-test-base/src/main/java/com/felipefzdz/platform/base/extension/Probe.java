@@ -1,4 +1,4 @@
-package com.felipefzdz.extension;
+package com.felipefzdz.platform.base.extension;
 
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;

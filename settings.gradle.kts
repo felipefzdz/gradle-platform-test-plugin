@@ -3,9 +3,9 @@ plugins {
 }
 
 rootProject.name = "gradle-platform-test-plugin"
-include("platform-shared")
 include("kubernetes-test")
 include("platform-test")
+include("platform-test-base")
 
 gradleEnterprise {
     buildScan {

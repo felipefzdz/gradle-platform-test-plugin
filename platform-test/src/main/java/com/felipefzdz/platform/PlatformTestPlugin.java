@@ -1,10 +1,11 @@
 package com.felipefzdz.platform;
 
+import com.felipefzdz.platform.base.PlatformTestBasePlugin;
 import com.felipefzdz.platform.extension.PlatformExtensionConfigurer;
 import com.felipefzdz.platform.extension.PlatformTestExtension;
 import com.felipefzdz.platform.infrastructure.PlatformTestInvoker;
-import com.felipefzdz.tasks.CleanupPlatformTask;
-import com.felipefzdz.tasks.DeployPlatformTask;
+import com.felipefzdz.platform.base.tasks.CleanupPlatformTask;
+import com.felipefzdz.platform.base.tasks.DeployPlatformTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
@@ -21,6 +22,7 @@ public class PlatformTestPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        project.getPluginManager().apply(PlatformTestBasePlugin.class);
         PlatformTestExtension extension = PlatformExtensionConfigurer.setupExtension(objectFactory, project);
         PlatformTestInvoker invoker = new PlatformTestInvoker(extension);
         project.getExtensions().add(PlatformTestExtension.class, PlatformTestExtension.NAME, extension);

@@ -1,4 +1,4 @@
-package com.felipefzdz.tasks;
+package com.felipefzdz.platform.base.tasks;
 
 public interface Invoker {
     void setup();

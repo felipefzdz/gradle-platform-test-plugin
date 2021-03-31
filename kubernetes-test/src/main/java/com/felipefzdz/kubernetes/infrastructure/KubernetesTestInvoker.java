@@ -1,11 +1,11 @@
 package com.felipefzdz.kubernetes.infrastructure;
 
-import com.felipefzdz.infrastructure.HttpProbe;
-import com.felipefzdz.infrastructure.Shell;
+import com.felipefzdz.platform.base.infrastructure.HttpProbe;
+import com.felipefzdz.platform.base.infrastructure.Shell;
 import com.felipefzdz.kubernetes.extension.Chart;
 import com.felipefzdz.kubernetes.extension.Deployment;
 import com.felipefzdz.kubernetes.extension.KubernetesTestExtension;
-import com.felipefzdz.tasks.Invoker;
+import com.felipefzdz.platform.base.tasks.Invoker;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;

@@ -4,10 +4,11 @@ plugins {
     `kotlin-dsl`
     id("maven-publish")
     id("com.gradle.plugin-publish") version "0.12.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 group = "com.felipefzdz"
-version = "0.0.5"
+version = "0.0.6"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -23,7 +24,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.google.guava:guava:30.1-jre")
-    implementation(project(":platform-shared"))
+    implementation(project(":platform-test-base"))
     testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
 }
 

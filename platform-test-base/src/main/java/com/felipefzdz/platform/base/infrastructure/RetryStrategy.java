@@ -1,4 +1,4 @@
-package com.felipefzdz.infrastructure;
+package com.felipefzdz.platform.base.infrastructure;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ServiceUnavailableRetryStrategy;

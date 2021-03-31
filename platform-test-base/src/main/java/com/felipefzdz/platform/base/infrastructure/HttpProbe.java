@@ -1,6 +1,6 @@
-package com.felipefzdz.infrastructure;
+package com.felipefzdz.platform.base.infrastructure;
 
-import com.felipefzdz.extension.Probe;
+import com.felipefzdz.platform.base.extension.Probe;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -10,7 +10,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.felipefzdz.infrastructure.RetryStrategy.delayRetry;
+import static com.felipefzdz.platform.base.infrastructure.RetryStrategy.delayRetry;
 
 public class HttpProbe {
 

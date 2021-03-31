@@ -11,7 +11,7 @@ To use the Kubernetes Test plugin, include the following in your build script:
 [source,kotlin]
 ----
 plugins {
-    id("com.felipefzdz.kubernetes-test") version "0.0.8"
+    id("com.felipefzdz.kubernetes-test") version "0.0.10"
 }
 ----
 

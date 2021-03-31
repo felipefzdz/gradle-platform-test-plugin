@@ -1,9 +1,9 @@
 package com.felipefzdz.platform.infrastructure;
 
-import com.felipefzdz.infrastructure.HttpProbe;
-import com.felipefzdz.infrastructure.Shell;
+import com.felipefzdz.platform.base.infrastructure.HttpProbe;
+import com.felipefzdz.platform.base.infrastructure.Shell;
 import com.felipefzdz.platform.extension.PlatformTestExtension;
-import com.felipefzdz.tasks.Invoker;
+import com.felipefzdz.platform.base.tasks.Invoker;
 import com.google.common.base.Stopwatch;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.RegularFileProperty;
