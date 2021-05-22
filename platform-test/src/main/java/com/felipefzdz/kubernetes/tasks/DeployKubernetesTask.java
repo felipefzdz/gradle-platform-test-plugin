@@ -6,6 +6,7 @@ import com.felipefzdz.kubernetes.infrastructure.KubernetesTestInvoker;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public class DeployKubernetesTask extends ConventionTask {
         KubernetesTestInvoker.setup(this);
     }
 
-    @Input
+    @Internal
     public File getProjectDir() {
         return projectDir;
     }
@@ -44,6 +45,7 @@ public class DeployKubernetesTask extends ConventionTask {
     public void setProbe(Probe probe) {
         this.probe = probe;
     }
+
     @Input
     public String getK3dVersion() {
         return k3dVersion;
@@ -52,6 +54,7 @@ public class DeployKubernetesTask extends ConventionTask {
     public void setK3dVersion(String k3dVersion) {
         this.k3dVersion = k3dVersion;
     }
+
     @Input
     public Property<String> getNamespace() {
         return namespace;
@@ -60,6 +63,7 @@ public class DeployKubernetesTask extends ConventionTask {
     public void setNamespace(Property<String> namespace) {
         this.namespace = namespace;
     }
+
     @Input
     public Deployment getDeployment() {
         return deployment;
