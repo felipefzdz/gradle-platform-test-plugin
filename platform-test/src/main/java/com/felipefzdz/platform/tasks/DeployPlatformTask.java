@@ -5,11 +5,9 @@ import com.felipefzdz.platform.infrastructure.PlatformTestInvoker;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.work.DisableCachingByDefault;
 
 import java.io.File;
 
-@DisableCachingByDefault
 public class DeployPlatformTask extends ConventionTask {
 
     private File projectDir;

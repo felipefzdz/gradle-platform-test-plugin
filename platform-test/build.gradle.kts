@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.felipefzdz"
-version = "0.0.9"
+version = "0.0.8"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -19,12 +19,11 @@ repositories {
 }
 
 dependencies {
-    implementation("org.codehaus.groovy:groovy:3.0.7")
+    implementation("org.codehaus.groovy:groovy:2.5.12")
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.google.guava:guava:30.1-jre")
-    testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
-    testImplementation("org.spockframework:spock-junit4:2.0-groovy-3.0")
+    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
     testImplementation("org.rauschig:jarchivelib:1.1.0")
 }
 

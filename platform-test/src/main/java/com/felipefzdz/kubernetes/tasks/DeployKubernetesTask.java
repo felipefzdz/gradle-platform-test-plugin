@@ -6,11 +6,9 @@ import com.felipefzdz.kubernetes.infrastructure.KubernetesTestInvoker;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.work.DisableCachingByDefault;
 
 import java.io.File;
 
-@DisableCachingByDefault
 public class DeployKubernetesTask extends ConventionTask {
 
     private File projectDir;
