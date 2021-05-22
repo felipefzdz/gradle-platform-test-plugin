@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
 public class Shell {
 
@@ -24,7 +25,7 @@ public class Shell {
                 .directory(projectDir)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true);
-        builder.environment().clear();
+        prepareEnvironment(logger, builder.environment());
 
         builder.redirectErrorStream(true);
 
@@ -45,5 +46,15 @@ public class Shell {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void prepareEnvironment(Logger logger, final Map<String, String> environment) {
+        final String path = environment.get("PATH");
+        final String home = environment.get("HOME");
+        environment.clear();
+        environment.put("PATH", path);
+        environment.put("HOME", home);
+        logger.debug("Environment keys after preparing it for isolated Shellcheck execution: " + environment.keySet());
+
     }
 }
