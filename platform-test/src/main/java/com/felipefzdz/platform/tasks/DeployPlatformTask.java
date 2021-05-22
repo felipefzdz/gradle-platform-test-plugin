@@ -4,6 +4,7 @@ import com.felipefzdz.base.extension.Probe;
 import com.felipefzdz.platform.infrastructure.PlatformTestInvoker;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.internal.ConventionTask;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class DeployPlatformTask extends ConventionTask {
     public void run() {
         PlatformTestInvoker.setup(this);
     }
-
+    @Input
     public File getProjectDir() {
         return projectDir;
     }
@@ -32,7 +33,7 @@ public class DeployPlatformTask extends ConventionTask {
     public void setProjectDir(File projectDir) {
         this.projectDir = projectDir;
     }
-
+    @Input
     public Probe getProbe() {
         return probe;
     }
@@ -40,7 +41,7 @@ public class DeployPlatformTask extends ConventionTask {
     public void setProbe(Probe probe) {
         this.probe = probe;
     }
-
+    @Input
     public RegularFileProperty getConfig() {
         return config;
     }
@@ -48,7 +49,7 @@ public class DeployPlatformTask extends ConventionTask {
     public void setConfig(RegularFileProperty config) {
         this.config = config;
     }
-
+    @Input
     public RegularFileProperty getProvision() {
         return provision;
     }
@@ -57,6 +58,7 @@ public class DeployPlatformTask extends ConventionTask {
         this.provision = provision;
     }
 
+    @Input
     public String getFootlooseVersion() {
         return footlooseVersion;
     }

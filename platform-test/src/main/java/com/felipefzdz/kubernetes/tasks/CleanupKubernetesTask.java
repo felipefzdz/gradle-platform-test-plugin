@@ -2,6 +2,7 @@ package com.felipefzdz.kubernetes.tasks;
 
 import com.felipefzdz.kubernetes.infrastructure.KubernetesTestInvoker;
 import org.gradle.api.internal.ConventionTask;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class CleanupKubernetesTask extends ConventionTask {
         KubernetesTestInvoker.cleanup(this);
     }
 
+    @Input
     public File getProjectDir() {
         return projectDir;
     }
@@ -25,6 +27,7 @@ public class CleanupKubernetesTask extends ConventionTask {
         this.projectDir = projectDir;
     }
 
+    @Input
     public String getK3dVersion() {
         return k3dVersion;
     }
