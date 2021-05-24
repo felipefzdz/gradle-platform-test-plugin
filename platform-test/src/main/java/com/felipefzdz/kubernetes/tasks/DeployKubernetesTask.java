@@ -60,10 +60,6 @@ public class DeployKubernetesTask extends ConventionTask {
         return namespace;
     }
 
-    public void setNamespace(Property<String> namespace) {
-        this.namespace = namespace;
-    }
-
     @Input
     public Deployment getDeployment() {
         return deployment;
